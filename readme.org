@@ -95,22 +95,22 @@ binding label for the TCR-peptide pair.
 
 ** Dataset
 
-+ Dataset $\mathcal{D}$
++ Dataset \(\mathcal{D}\)
   - VDJdb [cite/ft/f:@bagaevVDJdb2019Database2020]
   - McPAS-TCR [cite/ft/f:@tickotskyMcPASTCRManuallyCurated2017]
-+ Labeled (Training dataset, $\mathcal{D}_{train}$)
++ Labeled (Training dataset, \(\mathcal{D}_{train}\))
   - TCR-peptide pairs with known binding affinity (1 positive, 0 negative)
 + Unlabeled
-   - TCRdb (no peptide) with peptide from $\mathcal{D}$.
-   - $\mathcal{D}_{auxiliary}$
+   - TCRdb (no peptide) with peptide from \(\mathcal{D}\).
+   - \(\mathcal{D}_{auxiliary}\)
 
 ** Method
 
 There are four steps in a single training step:
 
-+ Learning from labeled dataset $\mathcal{L}_{label}$
-+ Learning from physical modeling $\mathcal{L}_{phy}$
-+ Learning from data-augmented pseudo-labeling $\mathcal{L}_{pseudo-label}$
++ Learning from labeled dataset \(\mathcal{L}_{label}\)
++ Learning from physical modeling \(\mathcal{L}_{phy}\)
++ Learning from data-augmented pseudo-labeling \(\mathcal{L}_{pseudo-label}\)
 + Look ahead meta-update
 
 *** Overview                                     :BMCOL:B_block:
@@ -129,34 +129,34 @@ There are four steps in a single training step:
 
 [[./p3.png]]
 
-** Learning from labeled dataset $\mathcal{L}_{label}$
+** Learning from labeled dataset \(\mathcal{L}_{label}\)
 
-+ $pred = f_{\theta}(t, p)$
-   - $t$ is the TCR
-   - $p$ is the peptide
++ \(pred = f_{\theta}(t, p)\)
+   - \(t\) is the TCR
+   - \(p\) is the peptide
    - The embedding of TCR and peptide from ERGO [cite/ft/f:@springerPredictionSpecificTCRPeptide2020].
       * TCRs use LSTM or AE
       * Peptides use LSTM
-   - $f_{\theta}$ is the model
-      * $f_{\theta} = MLP(concat(t, p))$
-+ $\mathcal{L}_{label} = BCE(pred, y)$
+   - \(f_{\theta}\) is the model
+      * \(f_{\theta} = MLP(concat(t, p))\)
++ \(\mathcal{L}_{label} = BCE(pred, y)\)
 
-** Learning from physical modeling $\mathcal{L}_{phy}$
+** Learning from physical modeling \(\mathcal{L}_{phy}\)
 
 + Molecular dynamic (MD): accurate but slow
 + Docking energy: HDOCK [cite/ft/f:@yanHDOCKServerIntegrated2020a]
 + TCR/Peptide -> BLAST+ -> MSA -> MODELLER -> Structure -> Docking energy
    - Top 25% Negative
    - Bottom 25% Positive
-+ $pred' = f_{\theta}(t', p')$
-   - $(t', p')$ become tuples in $\mathcal{D}_{auxiliary}$
-+ $\mathcal{L}_{phy} = BCE(pred', y)$
++ \(pred' = f_{\theta}(t', p')\)
+   - \((t', p')$ become tuples in $\mathcal{D}_{auxiliary}\)
++ \(\mathcal{L}_{phy} = BCE(pred', y)\)
 
-** Learning from data-augmented pseudo-labeling $\mathcal{L}_{pseudo-label}$
+** Learning from data-augmented pseudo-labeling \(\mathcal{L}_{pseudo-label}\)
 
-+ $prob = f_{teacher}(t', p')$
-+ $pred' = f_{\theta}(t', p')$
-+ $\mathcal{L}_{pseudo-label} = \mathtt{KL-divergence}(pred', prob)$
++ \(prob = f_{teacher}(t', p')\)
++ \(pred' = f_{\theta}(t', p')\)
++ \(\mathcal{L}_{pseudo-label} = \mathtt{KL-divergence}(pred', prob)\)
 
 ** Look Ahead Meta-Update
 :PROPERTIES:
@@ -164,24 +164,24 @@ There are four steps in a single training step:
 :END:
 
 + Learning from labeled dataset
-   - $out = model(t, p)$
-   - $\mathcal{L}_{label} = BCE(out)$
-   - $model.update(\mathcal{L}_{label})$
+   - \(out = model(t, p)\)
+   - \(\mathcal{L}_{label} = BCE(out)\)
+   - \(model.update(\mathcal{L}_{label})\)
 + Learning from data-augmented pseudo-labeling
-   - $out = model(t', p')$
-   - $out' = model_{teacher}(t', p')$
-   - $\mathcal{L}_{pseudo-label} = KL(out, out')$
-   - $model.update(\mathcal{L}_{pseudo-label})$
-   - $param = model.param$
+   - \(out = model(t', p')\)
+   - \(out' = model_{teacher}(t', p')\)
+   - \(\mathcal{L}_{pseudo-label} = KL(out, out')\)
+   - \(model.update(\mathcal{L}_{pseudo-label})\)
+   - \(param = model.param\)
 + Learning from physical modeling
-   - $out = model(t', p')$
-   - $\mathcal{L}_{phy} = BCE(out)$
-   - $model.update(\mathcal{L}_{phy})$
+   - \(out = model(t', p')\)
+   - \(\mathcal{L}_{phy} = BCE(out)\)
+   - \(model.update(\mathcal{L}_{phy})\)
 + Look ahead meta-update
    - Learning Rate * 2
-   - $\mathcal{L} = BCE(model(t, p))$
-   - If $\mathcal{L} > \mathcal{L}_{label}$
-      * $model.param = param$
+   - \(\mathcal{L} = BCE(model(t, p))\)
+   - If \(\mathcal{L} > \mathcal{L}_{label}\)
+      * \(model.param = param\)
 
 ** Look Ahead Meta-Update
 
